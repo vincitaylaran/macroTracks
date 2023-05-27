@@ -22,8 +22,8 @@ router.post('/get', macrosController.getFood, (req, res) =>
   res.status(200).json(res.locals.food)
 );
 
-router.post('/search', macrosController.searchFood, (req, res) => {
-  res.status(200).json(res.locals.food);
+router.get('/search', macrosController.searchFood, (req, res) => {
+  res.status(200).json(res.locals.queryResult);
 });
 
 router.post('/', macrosController.addFood, (req, res) => {

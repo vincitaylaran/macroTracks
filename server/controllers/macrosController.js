@@ -76,20 +76,23 @@ macrosController.addFood = (req, res, next) => {
 macrosController.searchFood = (req, res, next) => {
   const options = {
     method: 'GET',
-    url: `https://nutritionix-api.p.rapidapi.com/v1_1/search/${req.body.item_name}?results=0:20&fields=item_name,nf_calories,nf_protein,nf_total_carbohydrate,nf_total_fat,nf_serving_weight_grams`,
+    url: 'https://edamam-food-and-grocery-database.p.rapidapi.com/api/food-database/v2/parser',
     headers: {
-      'X-RapidAPI-Key': process.env.NUTRITIONIX_API_KEY,
-      'X-RapidAPI-Host': 'nutritionix-api.p.rapidapi.com',
+      'X-RapidAPI-Key': process.env.EDAMAM_API_KEY,
+      'X-RapidAPI-Host': 'edamam-food-and-grocery-database.p.rapidapi.com',
     },
+    params: {
+      ingr: req.query.foodQuery
+    }
   };
 
   axios
     .request(options)
     .then(function (response) {
-      return response.data.hits[0].fields;
+      return response.data;
     })
-    .then((obj) => {
-      res.locals.food = obj;
+    .then((data) => {
+      res.locals.queryResult = data;
       next();
     })
     .catch((err) => {

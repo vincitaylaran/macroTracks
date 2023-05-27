@@ -30,8 +30,8 @@ const useInput = (init) => {
 
 const AddFood = () => {
   const user = useContext(UserContext);
-  const [item_name, nameOnChange] = useInput('');
-  const [serving_size, sizeOnChange] = useInput('');
+  const [foodQuery, foodQueryOnChange] = useInput('');
+  const [servingSize, sizeOnChange] = useInput('');
 
   function searchFoodFromAPIAndAddToDb() {
     fetch('/api/search', {
@@ -39,7 +39,7 @@ const AddFood = () => {
       headers: {
         'Content-Type': 'Application/JSON',
       },
-      body: JSON.stringify({ item_name }),
+      body: JSON.stringify({ item_name: foodQuery }),
     })
       .then((resp) => {
         return resp.json();
@@ -59,19 +59,19 @@ const AddFood = () => {
           date: new Date(),
           item_name: item_name,
           nf_calories: Math.ceil(
-            (serving_size / nf_serving_weight_grams) * nf_calories
+            (servingSize / nf_serving_weight_grams) * nf_calories
           ),
           nf_total_fat: Math.ceil(
-            (serving_size / nf_serving_weight_grams) * nf_total_fat
+            (servingSize / nf_serving_weight_grams) * nf_total_fat
           ),
           nf_total_carbohydrate: Math.ceil(
-            (serving_size / nf_serving_weight_grams) * nf_total_carbohydrate
+            (servingSize / nf_serving_weight_grams) * nf_total_carbohydrate
           ),
           nf_protein: Math.ceil(
-            (serving_size / nf_serving_weight_grams) * nf_protein
+            (servingSize / nf_serving_weight_grams) * nf_protein
           ),
 
-          nf_serving_weight_grams: serving_size,
+          nf_serving_weight_grams: servingSize,
         };
 
         let newCalories = Math.floor(user.calories + body.nf_calories);
@@ -85,7 +85,7 @@ const AddFood = () => {
         user.setProtein(newProtein);
         user.setFat(newFat);
         user.setCarbohydrate(newCarbohydrate);
-        user.setServingSizeGram(serving_size);
+        user.setServingSizeGram(servingSize);
 
         fetch('/api', {
           method: 'POST',
@@ -101,6 +101,14 @@ const AddFood = () => {
 
       .catch((err) => console.log('SearchFood fetch: ERROR: ', err));
   }
+
+  const searchFood = async () => {
+    const req = await fetch(`/api/search?foodQuery=${foodQuery}`);
+    const res = await req.json();
+    console.log({ res });
+  };
+
+  const saveToDatabase = () => {};
 
   return (
     <div className='editFoodPages'>
@@ -118,8 +126,8 @@ const AddFood = () => {
               className='input'
               name='Food'
               placeholder='Enter food'
-              value={item_name}
-              onChange={nameOnChange}
+              value={foodQuery}
+              onChange={foodQueryOnChange}
             />
           </div>
           <div className='editFoodFields'>
@@ -128,7 +136,7 @@ const AddFood = () => {
               className='input'
               name='Food'
               placeholder='Enter grams'
-              value={serving_size}
+              value={servingSize}
               onChange={sizeOnChange}
             />
           </div>
@@ -138,11 +146,7 @@ const AddFood = () => {
                 Go Back
               </button>
             </Link>
-            <button
-              type='button'
-              className='btnMainAdd'
-              onClick={searchFoodFromAPIAndAddToDb}
-            >
+            <button type='button' className='btnMainAdd' onClick={searchFood}>
               Save
             </button>
           </div>
